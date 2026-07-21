@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MercadoFácil - Sistema Inteligente de Gestión e Inventario</title>
+    <style>
+        /* Estilos Generales */
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /* Pantalla de Login */
+        .login-container {
+            width: 360px;
+            margin: 60px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .login-container h1 {
+            color: #007bff;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        .login-container h2 {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .login-help {
+            margin-top: 15px;
+            font-size: 11px;
+            color: #888;
+            line-height: 1.4;
+        }
+
+        /* Dashboard Principal */
+        .dashboard {
+            display: none;
+        }
+
+        header {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Pestañas */
+        .tabs {
+            display: flex;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .tab-btn.active {
+            background-color: white;
+            border-bottom: 3px solid #007bff;
+            color: #007bff;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+            margin: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Módulo de Ventas */
+        .pos-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .pos-bar input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-add {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .client-box {
+            background-color: #eef5ff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #cce5ff;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .client-box input {
+            padding: 8px;
+            border: 1px solid #b8daff;
+            border-radius: 4px;
+        }
+
+        /* Módulo Reabastecimiento */
+        .restock-box {
+            background-color: #e6f4ea;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #b7e1cd;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .restock-box select, .restock-box input {
+            padding: 8px 12px;
+            border: 1px solid #a8d5ba;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-restock {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        table th {
+            background-color: #f8f9fa;
+        }
+
+        /* Alertas de Inventario */
+        tr.alerta-stock {
+            background-color: #fff3cd !important; /* Amarillo para Stock Bajo */
+        }
+
+        tr.alerta-venc {
+            background-color: #f8d7da !important; /* Rojo para Próximo a Vencer */
+        }
+
+        tr.alerta-agotado {
+            background-color: #f5c6cb !important; /* Rojo Oscuro para Agotado */
+            font-weight: bold;
+        }
+
+        /* Badges de Estado */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .badge-ok { background-color: #d4edda; color: #155724; }
+        .badge-low { background-color: #ffe8a1; color: #856404; }
+        .badge-out { background-color: #dc3545; color: #ffffff; }
+
+        .pos-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid #343a40;
+            padding-top: 15px;
+        }
+
+        .total-amount {
+            font-size: 22px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Módulo Historial */
+        .search-box {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box input {
+            padding: 8px 12px;
+            width: 320px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. PANTALLA DE LOGIN -->
+    <div id="login-screen" class="login-container">
+        <h1>MercadoFácil</h1>
+        <h2>Sistema Inteligente de Gestión</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Usuario:</label>
+                <input type="text" id="username" value="admin" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" value="admin123" required>
+            </div>
+            <button type="submit" class="btn">Ingresar</button>
+        </form>
+        <div class="login-help">
+            <strong>Usuarios de prueba:</strong><br>
+            • Admin: admin / admin123<br>
+            • Caja: cajero / cajero123<br>
+            • Almacén: almacen / almacen123
+        </div>
+    </div>
+
+    <!-- 2. DASHBOARD PRINCIPAL -->
+    <div id="dashboard-screen" class="dashboard">
+        <header>
+            <div id="user-info">Usuario: - | Rol: -</div>
+            <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </header>
+
+        <div class="tabs">
+            <button id="btn-tab-ventas" class="tab-btn active" onclick="switchTab('tab-ventas')">Punto de Venta (Caja)</button>
+            <button id="btn-tab-inventario" class="tab-btn" onclick="switchTab('tab-inventario')">Gestión de Inventario</button>
+            <button id="btn-tab-historial" class="tab-btn" onclick="switchTab('tab-historial')">Historial de Ventas / Clientes</button>
+        </div>
+
+        <!-- MÓDULO VENTAS -->
+        <div id="tab-ventas" class="tab-content active">
+            <h2>Punto de Venta</h2>
+            <br>
+            
+            <!-- Datos opcionales del cliente -->
+            <div class="client-box">
+                <strong>Datos del Cliente (Perú):</strong>
+                <input type="text" id="client-dni" placeholder="DNI (8 dígitos)" maxlength="8" style="width: 140px;">
+                <input type="text" id="client-name" placeholder="Nombre completo del cliente" style="width: 260px;">
+            </div>
+
+            <div class="pos-bar">
+                <input type="text" id="barcode-input" placeholder="Escanee código (Ej: 7750001 a 7750020)" style="width: 280px;" autofocus>
+                <button class="btn-add" onclick="agregarAlCarrito()">Agregar Producto</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Precio (S/)</th>
+                        <th>Cant.</th>
+                        <th>Subtotal (S/)</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-table-body">
+                    <!-- Filas del carrito dinámicas -->
+                </tbody>
+            </table>
+
+            <div class="pos-footer">
+                <div class="total-amount" id="total-text">TOTAL: S/ 0.00</div>
+                <button class="btn" style="width: auto; padding: 12px 25px;" onclick="procesarCobro()">PROCESAR COBRO</button>
+            </div>
+        </div>
+
+        <!-- MÓDULO INVENTARIO -->
+        <div id="tab-inventario" class="tab-content">
+            <h2>Control de Inventarios y Entradas de Mercadería</h2>
+            <br>
+
+            <!-- PANEL DE ENTRADA / REABASTECIMIENTO DE MERCADERÍA -->
+            <div class="restock-box">
+                <strong>📦 Reabastecer Mercadería (Entrada):</strong>
+                <select id="select-product-restock" style="width: 280px;">
+                    <!-- Opciones cargadas dinámicamente -->
+                </select>
+                <input type="number" id="input-qty-restock" placeholder="Cantidad a sumar" min="1" style="width: 150px;">
+                <button class="btn-restock" onclick="ingresarStock()">+ Agregar al Stock</button>
+            </div>
+
+            <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                * Leyenda de alertas: 
+                <span style="background-color: #dc3545; color:white; padding: 2px 6px; border-radius:3px;">Agotado (0)</span>
+                <span style="background-color: #fff3cd; padding: 2px 6px; border-radius:3px; margin-left:5px;">Stock Mínimo</span> 
+                <span style="background-color: #f8d7da; padding: 2px 6px; border-radius:3px; margin-left:5px;">Próximo a Vencer</span>
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Categoría</th>
+                        <th>P. Compra</th>
+                        <th>P. Venta</th>
+                        <th>Stock Actual</th>
+                        <th>Estado de Stock</th>
+                        <th>F. Vencimiento</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-table-body">
+                    <!-- Filas de inventario dinámicas -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- MÓDULO HISTORIAL DE VENTAS Y CLIENTES -->
+        <div id="tab-historial" class="tab-content">
+            <h2>Historial de Compras por Cliente</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Registro detallado de todas las ventas procesadas con identificación de cliente (DNI).</p>
+
+            <div class="search-box">
+                <label for="search-client"><strong>Buscar por DNI o Nombre:</strong></label>
+                <input type="text" id="search-client" placeholder="Ingrese DNI o nombre..." onkeyup="filtrarHistorial()">
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>N° Ticket</th>
+                        <th>Fecha / Hora</th>
+                        <th>DNI Cliente</th>
+                        <th>Cliente</th>
+                        <th>Detalle de Compras</th>
+                        <th>Total (S/)</th>
+                        <th>Atendido Por</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table-body">
+                    <!-- Filas de ventas dinámicas -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- 3. LÓGICA JAVASCRIPT -->
+    <script>
+        // Inicializar datos de prueba si no existen
+        function inicializarDatos() {
+            if (!localStorage.getItem('usuarios')) {
+                const usuarios = [
+                    { user: 'admin', pass: 'admin123', nombre: 'Administrador General', rol: 'Administrador' },
+                    { user: 'cajero', pass: 'cajero123', nombre: 'Cajero Principal', rol: 'Personal de Ventas' },
+                    { user: 'almacen', pass: 'almacen123', nombre: 'Encargado Almacén', rol: 'Encargado de Almacen' }
+                ];
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            }
+
+            if (!localStorage.getItem('productos_v2')) {
+                const fechaProxima = new Date();
+                fechaProxima.setDate(fechaProxima.getDate() + 8);
+                const fechaStrCercana = fechaProxima.toISOString().split('T')[0];
+
+                const productos = [
+                    { codigo: '7750001', desc: 'Leche Evaporada 400g', cat: 'Lácteos', pCompra: 3.20, pVenta: 4.20, stock: 12, stockMin: 5, vencimiento: fechaStrCercana },
+                    { codigo: '7750002', desc: 'Arroz Superior 1kg', cat: 'Abarrotes', pCompra: 3.80, pVenta: 4.50, stock: 0, stockMin: 5, vencimiento: '2027-12-31' }, // Agotado para pruebas
+                    { codigo: '7750003', desc: 'Aceite Vegetal 1L', cat: 'Abarrotes', pCompra: 7.20, pVenta: 8.90, stock: 25, stockMin: 8, vencimiento: '2027-08-15' },
+                    { codigo: '7750004', desc: 'Azúcar Rubia 1kg', cat: 'Abarrotes', pCompra: 3.10, pVenta: 3.80, stock: 40, stockMin: 10, vencimiento: '2028-01-10' },
+                    { codigo: '7750005', desc: 'Fideos Tallarín 500g', cat: 'Abarrotes', pCompra: 2.10, pVenta: 2.80, stock: 2, stockMin: 6, vencimiento: '2027-11-20' },
+                    { codigo: '7750006', desc: 'Yogurt Frutado 1L', cat: 'Lácteos', pCompra: 5.00, pVenta: 6.80, stock: 15, stockMin: 5, vencimiento: fechaStrCercana },
+                    { codigo: '7750007', desc: 'Queso Edam 250g', cat: 'Lácteos', pCompra: 8.50, pVenta: 11.00, stock: 8, stockMin: 3, vencimiento: '2027-04-12' },
+                    { codigo: '7750008', desc: 'Mantequilla con Sal 200g', cat: 'Lácteos', pCompra: 4.80, pVenta: 6.20, stock: 4, stockMin: 5, vencimiento: '2027-06-30' },
+                    { codigo: '7750009', desc: 'Gaseosa Cola 1.5L', cat: 'Bebidas', pCompra: 4.20, pVenta: 5.50, stock: 30, stockMin: 10, vencimiento: '2027-09-01' },
+                    { codigo: '7750010', desc: 'Agua Mineral Sin Gas 2.5L', cat: 'Bebidas', pCompra: 3.00, pVenta: 4.50, stock: 50, stockMin: 12, vencimiento: '2028-03-15' },
+                    { codigo: '7750011', desc: 'Jugo de Naranja 1L', cat: 'Bebidas', pCompra: 3.90, pVenta: 5.20, stock: 18, stockMin: 6, vencimiento: fechaStrCercana },
+                    { codigo: '7750012', desc: 'Detergente en Polvo 1kg', cat: 'Limpieza', pCompra: 8.90, pVenta: 11.50, stock: 20, stockMin: 5, vencimiento: '2029-01-01' },
+                    { codigo: '7750013', desc: 'Lavavajillas En Crema 500g', cat: 'Limpieza', pCompra: 3.50, pVenta: 4.80, stock: 14, stockMin: 4, vencimiento: '2028-05-10' },
+                    { codigo: '7750014', desc: 'Jabón de Tocador Pack x3', cat: 'Limpieza', pCompra: 6.00, pVenta: 7.90, stock: 22, stockMin: 6, vencimiento: '2029-10-20' },
+                    { codigo: '7750015', desc: 'Papel Higiénico Pack x4', cat: 'Limpieza', pCompra: 4.00, pVenta: 5.80, stock: 35, stockMin: 8, vencimiento: '2030-01-01' },
+                    { codigo: '7750016', desc: 'Galletas Rellenas Pack x6', cat: 'Golosinas', pCompra: 3.00, pVenta: 4.20, stock: 28, stockMin: 10, vencimiento: '2027-07-18' },
+                    { codigo: '7750017', desc: 'Chocolate de Leche 100g', cat: 'Golosinas', pCompra: 3.50, pVenta: 5.00, stock: 19, stockMin: 5, vencimiento: '2027-10-05' },
+                    { codigo: '7750018', desc: 'Café Instantáneo 200g', cat: 'Abarrotes', pCompra: 12.00, pVenta: 15.50, stock: 11, stockMin: 4, vencimiento: '2028-02-28' },
+                    { codigo: '7750019', desc: 'Atún en Trozos 170g', cat: 'Abarrotes', pCompra: 4.30, pVenta: 5.80, stock: 0, stockMin: 8, vencimiento: '2028-11-11' }, // Agotado para pruebas
+                    { codigo: '7750020', desc: 'Pan de Molde Familiar', cat: 'Panadería', pCompra: 5.20, pVenta: 7.00, stock: 9, stockMin: 4, vencimiento: fechaStrCercana }
+                ];
+                localStorage.setItem('productos_v2', JSON.stringify(productos));
+            }
+
+            if (!localStorage.getItem('ventas_v1')) {
+                const ventasIniciales = [
+                    {
+                        idTicket: 'TCK-1001',
+                        fecha: '2026-03-20 10:15',
+                        dni: '72839410',
+                        cliente: 'Juan Carlos Pérez',
+                        items: '2x Leche Evaporada, 1x Arroz Superior',
+                        total: 12.90,
+                        cajero: 'Cajero Principal'
+                    }
+                ];
+                localStorage.setItem('ventas_v1', JSON.stringify(ventasIniciales));
+            }
+        }
+
+        let usuarioActual = null;
+        let carrito = [];
+
+        // Validar Login
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const usr = document.getElementById('username').value;
+            const pas = document.getElementById('password').value;
+
+            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
+            const enco = usuarios.find(u => u.user === usr && u.pass === pas);
+
+            if (enco) {
+                usuarioActual = enco;
+                document.getElementById('user-info').innerText = `Usuario: ${enco.nombre} | Rol: ${enco.rol}`;
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-screen').style.display = 'block';
+                
+                // Restricciones según rol
+                if(enco.rol === 'Personal de Ventas') {
+                    document.getElementById('btn-tab-inventario').style.display = 'none';
+                    document.getElementById('btn-tab-historial').style.display = 'inline-block';
+                    switchTab('tab-ventas');
+                } else if(enco.rol === 'Encargado de Almacen') {
+                    document.getElementById('btn-tab-ventas').style.display = 'none';
+                    document.getElementById('btn-tab-historial').style.display = 'none';
+                    switchTab('tab-inventario');
+                } else {
+                    document.getElementById('btn-tab-inventario').style.display = 'inline-block';
+                    document.getElementById('btn-tab-ventas').style.display = 'inline-block';
+                    document.getElementById('btn-tab-historial').style.display = 'inline-block';
+                    switchTab('tab-ventas');
+                }
+
+                cargarInventario();
+                cargarHistorial();
+            } else {
+                alert('Usuario o contraseña incorrectos.');
+            }
+        });
+
+        function cerrarSesion() {
+            usuarioActual = null;
+            carrito = [];
+            document.getElementById('dashboard-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'block';
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            if(tabId === 'tab-ventas') document.getElementById('btn-tab-ventas').classList.add('active');
+            if(tabId === 'tab-inventario') {
+                document.getElementById('btn-tab-inventario').classList.add('active');
+                cargarInventario();
+            }
+            if(tabId === 'tab-historial') {
+                document.getElementById('btn-tab-historial').classList.add('active');
+                cargarHistorial();
+            }
+        }
+
+        // Carrito de Ventas
+        function agregarAlCarrito() {
+            const input = document.getElementById('barcode-input');
+            const cod = input.value.trim();
+            if(!cod) return;
+
+            const productos = JSON.parse(localStorage.getItem('productos_v2'));
+            const prod = productos.find(p => p.codigo === cod);
+
+            if(prod) {
+                if(prod.stock <= 0) {
+                    alert(`El producto '${prod.desc}' está AGOTADO. Debe reabastecerlo en la sección de Inventario.`);
+                    return;
+                }
+
+                const itemExistente = carrito.find(item => item.codigo === prod.codigo);
+                if(itemExistente) {
+                    if (itemExistente.cant + 1 > prod.stock) {
+                        alert(`No hay más stock disponible para '${prod.desc}'. Stock disponible: ${prod.stock}`);
+                        return;
+                    }
+                    itemExistente.cant += 1;
+                    itemExistente.subtotal = itemExistente.cant * itemExistente.precio;
+                } else {
+                    carrito.push({ codigo: prod.codigo, desc: prod.desc, precio: prod.pVenta, cant: 1, subtotal: prod.pVenta });
+                }
+
+                actualizarTablaCarrito();
+                input.value = '';
+            } else {
+                alert('Producto no encontrado. Pruebe con códigos del 7750001 al 7750020.');
+            }
+        }
+
+        function actualizarTablaCarrito() {
+            const tbody = document.getElementById('cart-table-body');
+            tbody.innerHTML = '';
+            let total = 0;
+
+            carrito.forEach(item => {
+                total += item.subtotal;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.codigo}</td>
+                    <td>${item.desc}</td>
+                    <td>S/ ${item.precio.toFixed(2)}</td>
+                    <td>${item.cant}</td>
+                    <td>S/ ${item.subtotal.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('total-text').innerText = `TOTAL: S/ ${total.toFixed(2)}`;
+        }
+
+        function procesarCobro() {
+            if(carrito.length === 0) {
+                alert('El carrito está vacío.');
+                return;
+            }
+
+            const dniVal = document.getElementById('client-dni').value.trim();
+            const clienteVal = document.getElementById('client-name').value.trim() || 'Cliente General';
+
+            if(dniVal && dniVal.length !== 8) {
+                alert('El DNI peruano debe tener exactamente 8 dígitos.');
+                return;
+            }
+
+            let productos = JSON.parse(localStorage.getItem('productos_v2'));
+
+            // Descontar Stock
+            carrito.forEach(item => {
+                let p = productos.find(prod => prod.codigo === item.codigo);
+                if(p) p.stock -= item.cant;
+            });
+
+            // Guardar Venta en Historial
+            let ventas = JSON.parse(localStorage.getItem('ventas_v1')) || [];
+            let totalVenta = carrito.reduce((acc, curr) => acc + curr.subtotal, 0);
+            let resumenItems = carrito.map(i => `${i.cant}x ${i.desc}`).join(', ');
+
+            const nuevaVenta = {
+                idTicket: 'TCK-' + Math.floor(1000 + Math.random() * 9000),
+                fecha: new Date().toLocaleString('es-PE'),
+                dni: dniVal || 'Sin DNI',
+                cliente: clienteVal,
+                items: resumenItems,
+                total: totalVenta,
+                cajero: usuarioActual ? usuarioActual.nombre : 'Anónimo'
+            };
+
+            ventas.unshift(nuevaVenta);
+
+            localStorage.setItem('productos_v2', JSON.stringify(productos));
+            localStorage.setItem('ventas_v1', JSON.stringify(ventas));
+
+            alert(`¡Venta registrada con éxito!\nTicket: ${nuevaVenta.idTicket}\nCliente: ${nuevaVenta.cliente}`);
+            
+            // Limpiar Campos
+            carrito = [];
+            document.getElementById('client-dni').value = '';
+            document.getElementById('client-name').value = '';
+            actualizarTablaCarrito();
+            cargarInventario();
+        }
+
+        // Cargar Inventario y Alertas
+        function cargarInventario() {
+            const tbody = document.getElementById('inventory-table-body');
+            const selectRestock = document.getElementById('select-product-restock');
+            
+            tbody.innerHTML = '';
+            selectRestock.innerHTML = '<option value="">-- Seleccionar Producto --</option>';
+
+            const productos = JSON.parse(localStorage.getItem('productos_v2'));
+            const hoy = new Date();
+
+            productos.forEach(p => {
+                // Llenar selector de reabastecimiento
+                const option = document.createElement('option');
+                option.value = p.codigo;
+                option.textContent = `${p.codigo} - ${p.desc} (Stock actual: ${p.stock})`;
+                selectRestock.appendChild(option);
+
+                // Crear fila en tabla
+                const tr = document.createElement('tr');
+                const fechaVenc = new Date(p.vencimiento);
+                const diffDias = Math.ceil((fechaVenc - hoy) / (1000 * 60 * 60 * 24));
+
+                let estadoHtml = '';
+
+                // Evaluación de Estados
+                if (p.stock === 0) {
+                    tr.classList.add('alerta-agotado');
+                    estadoHtml = '<span class="badge badge-out">AGOTADO</span>';
+                } else if (p.stock <= p.stockMin) {
+                    tr.classList.add('alerta-stock');
+                    estadoHtml = '<span class="badge badge-low">Stock Bajo</span>';
+                } else {
+                    estadoHtml = '<span class="badge badge-ok">Disponible</span>';
+                }
+
+                if(p.stock > 0 && diffDias <= 15) {
+                    tr.classList.add('alerta-venc');
+                }
+
+                tr.innerHTML = `
+                    <td>${p.codigo}</td>
+                    <td>${p.desc}</td>
+                    <td>${p.cat}</td>
+                    <td>S/ ${p.pCompra.toFixed(2)}</td>
+                    <td>S/ ${p.pVenta.toFixed(2)}</td>
+                    <td><strong>${p.stock}</strong></td>
+                    <td>${estadoHtml}</td>
+                    <td>${p.vencimiento}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Función para agregar stock comprado
+        function ingresarStock() {
+            const codProd = document.getElementById('select-product-restock').value;
+            const cantAgregar = parseInt(document.getElementById('input-qty-restock').value);
+
+            if(!codProd) {
+                alert('Por favor seleccione un producto para reabastecer.');
+                return;
+            }
+
+            if(isNaN(cantAgregar) || cantAgregar <= 0) {
+                alert('Ingrese una cantidad válida mayor a cero.');
+                return;
+            }
+
+            let productos = JSON.parse(localStorage.getItem('productos_v2'));
+            let prod = productos.find(p => p.codigo === codProd);
+
+            if(prod) {
+                prod.stock += cantAgregar;
+                localStorage.setItem('productos_v2', JSON.stringify(productos));
+                alert(`¡Se agregaron ${cantAgregar} unidades de '${prod.desc}' al inventario!\nNuevo Stock Total: ${prod.stock}`);
+                
+                document.getElementById('input-qty-restock').value = '';
+                cargarInventario(); // Recargar tabla y desplegable
+            }
+        }
+
+        // Cargar Historial de Ventas
+        function cargarHistorial(filtro = '') {
+            const tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = '';
+
+            const ventas = JSON.parse(localStorage.getItem('ventas_v1')) || [];
+            const filtroLower = filtro.toLowerCase();
+
+            const ventasFiltradas = ventas.filter(v => 
+                v.dni.toLowerCase().includes(filtroLower) || 
+                v.cliente.toLowerCase().includes(filtroLower)
+            );
+
+            if (ventasFiltradas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#888;">No se encontraron registros de ventas.</td></tr>';
+                return;
+            }
+
+            ventasFiltradas.forEach(v => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${v.idTicket}</strong></td>
+                    <td>${v.fecha}</td>
+                    <td>${v.dni}</td>
+                    <td>${v.cliente}</td>
+                    <td>${v.items}</td>
+                    <td style="color:#28a745; font-weight:bold;">S/ ${v.total.toFixed(2)}</td>
+                    <td>${v.cajero}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filtrarHistorial() {
+            const query = document.getElementById('search-client').value;
+            cargarHistorial(query);
+        }
+
+        // Ejecutar inicialización al cargar
+        inicializarDatos();
+    </script>
+</body>
+</html>
